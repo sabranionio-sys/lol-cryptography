@@ -47,7 +47,7 @@ def set_page_background(bin_file):
         st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # Pastikan file gambar Yasuo yang kamu unggah bernama 'bg.jpg' di repository GitHub
-set_page_background('bg.png')
+set_page_background('bg.webp')
 
 # --- CSS DEKORASI ELEMEN ---
 st.markdown("""
@@ -167,4 +167,5 @@ with tab2:
             st.info("Pesan Terjemahan:")
             st.header(decoded)
             st.markdown("</div>", unsafe_allow_html=True)
+
 
