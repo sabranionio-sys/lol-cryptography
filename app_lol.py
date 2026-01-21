@@ -4,86 +4,73 @@ import base64
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
-    page_title="Hextech Cryptography",
+    page_title="Hextech Cryptography - League of Legends",
     page_icon="⚔️",
     layout="wide"
 )
 
-# --- FUNGSI UNTUK MENGAMBIL BACKGROUND LOKAL ---
+# --- FUNGSI BACKGROUND LOKAL ---
 def get_base64_of_bin_file(bin_file):
-    with open(bin_file, 'rb') as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
+    try:
+        with open(bin_file, 'rb') as f:
+            data = f.read()
+        return base64.b64encode(data).decode()
+    except:
+        return ""
 
 def set_png_as_page_bg(bin_file):
     bin_str = get_base64_of_bin_file(bin_file)
-    page_bg_img = '''
-    <style>
-    .stApp {
-        background-image: url("data:image/png;base64,%s");
-        background-size: cover;
-        background-attachment: fixed;
-    }
-    </style>
-    ''' % bin_str
-    st.markdown(page_bg_img, unsafe_allow_html=True)
+    if bin_str:
+        page_bg_img = '''
+        <style>
+        .stApp {
+            background-image: url("data:image/png;base64,%s");
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        </style>
+        ''' % bin_str
+        st.markdown(page_bg_img, unsafe_allow_html=True)
 
-# Jika kamu sudah upload file bernama bg.jpg ke GitHub, hapus tanda pagar (#) di bawah ini:
-# set_png_as_page_bg('bg.jpg')
+# Aktifkan ini jika file bg.jpg sudah ada di GitHub kamu
+set_png_as_page_bg('bg.jpg')
 
-# --- CSS KUSTOM DEKORASI HEXTECH ---
+# --- CSS KUSTOM ---
 st.markdown("""
     <style>
-    /* Font & Warna Dasar */
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
     
-    .main {
-        color: #f0e6d2;
-    }
-    
-    /* Overlay Gelap agar Teks Terbaca */
     .stApp {
         background: rgba(1, 10, 19, 0.7);
     }
-
-    h1, h2, h3 {
+    
+    h3 {
         font-family: 'Cinzel', serif;
         color: #c8aa6e !important;
         text-align: center;
         text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
     }
 
-    /* Kotak Input & Area Teks */
-    .stTextInput>div>div>input, .stTextArea>div>div>textarea {
-        background-color: rgba(30, 35, 40, 0.9) !important;
-        color: #f0e6d2 !important;
-        border: 2px solid #785a28 !important;
-        border-radius: 5px;
+    /* Memastikan semua teks di header rata tengah */
+    .header-text {
+        text-align: center;
+        color: #f0e6d2;
+        margin-bottom: 20px;
     }
 
-    /* Dekorasi Tombol Run */
     .stButton>button {
         background: linear-gradient(to bottom, #1e2328, #111);
         color: #c8aa6e;
         border: 2px solid #c8aa6e;
         font-weight: bold;
         width: 100%;
-        letter-spacing: 2px;
     }
     
-    .stButton>button:hover {
-        border-color: #f0e6d2;
-        color: #f0e6d2;
-        box-shadow: 0px 0px 15px rgba(200, 170, 110, 0.5);
-    }
-
-    /* Container Hasil */
     .result-box {
-        background-color: rgba(10, 50, 60, 0.6);
+        background-color: rgba(10, 50, 60, 0.7);
         border: 1px solid #0ac8b9;
         padding: 20px;
         border-radius: 10px;
-        margin-top: 20px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -111,53 +98,38 @@ class LOLCryptography:
         return chr(ord('K') + index - 1)
 
     def to_6bit_bin(self, n):
-        weights = [32, 16, 8, 4, 2, 1]
-        res = ""
-        for w in weights:
-            if n >= w:
-                res += "1"
-                n -= w
-            else:
-                res += "0"
-        return res
+        return format(n, '06b')
 
     def from_6bit_bin(self, b):
-        weights = [32, 16, 8, 4, 2, 1]
-        return sum(weights[i] for i, bit in enumerate(b) if bit == '1')
+        return int(b, 2)
 
 crypto = LOLCryptography()
 
-# --- HEADER WEB ---
-# --- HEADER WEB ---
-# Membuat teks berada di tengah dengan text-align: center
-st.markdown("<h1 style='font-size: 60px; text-align: center; margin-bottom: 0px;'>LEAGUE OF LEGENDS</h1>", unsafe_allow_html=True)
-
-# Membuat gambar logo berada di tengah menggunakan kolom bantu
+# --- HEADER WEB (TULISAN ATAS SUDAH DIHAPUS) ---
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image("https://upload.wikimedia.org/wikipedia/commons/d/d8/League_of_Legends_2019_vector.svg", use_column_width=True)
-st.markdown("### 🛡️ Hextech Cryptography Terminal")
-st.write("<center>Gunakan kekuatan Champion untuk menyembunyikan pesan rahasiamu.</center>", unsafe_allow_html=True)
 
-# --- TAMPILAN Champion Showcase ---
+st.markdown("### 🛡️ Hextech Cryptography Terminal")
+st.markdown("<p class='header-text'>Gunakan kekuatan Champion untuk menyembunyikan pesan rahasiamu.</p>", unsafe_allow_html=True)
+
+# --- SHOWCASE CHAMPION ---
 st.markdown("---")
-cols = st.columns(4)
+ch_cols = st.columns(4)
 champs = [
     "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vi_0.jpg",
     "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Caitlyn_0.jpg",
     "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_0.jpg",
     "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg"
 ]
-for i, col in enumerate(cols):
+for i, col in enumerate(ch_cols):
     col.image(champs[i], use_column_width=True)
 
 # --- TAB ENKRIPSI & DESKRIPSI ---
 tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
 
 with tab1:
-    st.markdown("### 📝 Masukkan Pesan")
-    plaintext = st.text_input("Plaintext:", placeholder="CONTOH: AKU KAYA")
-    
+    plaintext = st.text_input("Plaintext:", placeholder="Masukkan pesan...")
     if plaintext:
         res_bins = []
         for char in plaintext.upper():
@@ -175,9 +147,7 @@ with tab1:
         st.markdown("</div>", unsafe_allow_html=True)
 
 with tab2:
-    st.markdown("### 🗝️ Masukkan Kode Biner")
     ciphertext = st.text_area("Biner (12-bit per blok):")
-    
     if st.button("MULAI DEKRIPSI"):
         if ciphertext:
             bins = ciphertext.split()
@@ -196,7 +166,3 @@ with tab2:
             st.info("Pesan Terjemahan:")
             st.header(decoded)
             st.markdown("</div>", unsafe_allow_html=True)
-
-st.markdown("<br><br><center>© 2026 LOL Champion Cryptography Project | Created by Sabranio Widiyanto</center>", unsafe_allow_html=True)
-
-
