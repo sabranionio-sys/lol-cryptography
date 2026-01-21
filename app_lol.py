@@ -99,7 +99,7 @@ class LOLChampionCryptography:
 crypto = LOLChampionCryptography()
 
 # --- TAMPILAN HEADER ---
-st.image("https://www.leagueoflegends.com/static/logo-1200-589b3ef693048cc247a4528d4d68205.png", width=300)
+st.image("https://upload.wikimedia.org/wikipedia/commons/d/d8/League_of_Legends_2019_vector.svg", width=300)
 st.title("🛡️ Hextech Cryptography")
 st.write("Sembunyikan pesanmu di balik kode rahasia para Champion League of Legends.")
 
@@ -169,3 +169,4 @@ with tab2:
 
 st.markdown("---")
 st.caption("© 2026 LOL Champion Cryptography Project | Created by Sabranio Widiyanto")
+
