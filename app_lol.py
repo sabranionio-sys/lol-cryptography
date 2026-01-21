@@ -128,8 +128,14 @@ class LOLCryptography:
 crypto = LOLCryptography()
 
 # --- HEADER WEB ---
-st.markdown("<h1 style='font-size: 50px;'>LEAGUE OF LEGENDS</h1>", unsafe_allow_html=True)
-st.image("https://upload.wikimedia.org/wikipedia/commons/d/d8/League_of_Legends_2019_vector.svg", width=400)
+# --- HEADER WEB ---
+# Membuat teks berada di tengah dengan text-align: center
+st.markdown("<h1 style='font-size: 60px; text-align: center; margin-bottom: 0px;'>LEAGUE OF LEGENDS</h1>", unsafe_allow_html=True)
+
+# Membuat gambar logo berada di tengah menggunakan kolom bantu
+col1, col2, col3 = st.columns([1, 2, 1])
+with col2:
+    st.image("https://upload.wikimedia.org/wikipedia/commons/d/d8/League_of_Legends_2019_vector.svg", use_column_width=True)
 st.markdown("### 🛡️ Hextech Cryptography Terminal")
 st.write("<center>Gunakan kekuatan Champion untuk menyembunyikan pesan rahasiamu.</center>", unsafe_allow_html=True)
 
@@ -150,7 +156,7 @@ tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
 
 with tab1:
     st.markdown("### 📝 Masukkan Pesan")
-    plaintext = st.text_input("Plaintext:", placeholder="CONTOH: NIO ARDI")
+    plaintext = st.text_input("Plaintext:", placeholder="CONTOH: AKU KAYA")
     
     if plaintext:
         res_bins = []
@@ -192,3 +198,4 @@ with tab2:
             st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<br><br><center>© 2026 LOL Champion Cryptography Project | Created by Sabranio Widiyanto</center>", unsafe_allow_html=True)
+
