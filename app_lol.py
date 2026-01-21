@@ -108,7 +108,7 @@ tab1, tab2 = st.tabs(["🔒 Encode Message", "🔓 Decode Cipher"])
 
 with tab1:
     st.markdown("### Enkripsi Karakter ke 12-Bit")
-    input_text = st.text_input("Plaintext:", placeholder="CONTOH: NIO ARDI").upper()
+    input_text = st.text_input("Plaintext:", placeholder="CONTOH: AKU KAYA").upper()
     
     if input_text:
         final_bins = []
@@ -169,4 +169,5 @@ with tab2:
 
 st.markdown("---")
 st.caption("© 2026 LOL Champion Cryptography Project | Created by Sabranio Widiyanto")
+
 
