@@ -1,61 +1,95 @@
 import streamlit as st
 import math
+import base64
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
-    page_title="LOL Champion Cryptography", 
-    page_icon="⚔️", 
-    layout="centered"
+    page_title="Hextech Cryptography - League of Legends",
+    page_icon="⚔️",
+    layout="wide"
 )
 
-# --- CSS KUSTOM UNTUK DEKORASI ---
-# Menggunakan tema Hextech: Biru Gelap, Emas, dan Efek Glow
+# --- FUNGSI UNTUK MENGAMBIL BACKGROUND LOKAL ---
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+def set_png_as_page_bg(bin_file):
+    bin_str = get_base64_of_bin_file(bin_file)
+    page_bg_img = '''
+    <style>
+    .stApp {
+        background-image: url("data:image/png;base64,%s");
+        background-size: cover;
+        background-attachment: fixed;
+    }
+    </style>
+    ''' % bin_str
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+
+# Jika kamu sudah upload file bernama bg.jpg ke GitHub, hapus tanda pagar (#) di bawah ini:
+# set_png_as_page_bg('bg.jpg')
+
+# --- CSS KUSTOM DEKORASI HEXTECH ---
 st.markdown("""
     <style>
+    /* Font & Warna Dasar */
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+    
     .main {
-        background-color: #010a13;
-        color: #cdbe91;
+        color: #f0e6d2;
     }
+    
+    /* Overlay Gelap agar Teks Terbaca */
     .stApp {
-        background: linear-gradient(rgba(1, 10, 19, 0.8), rgba(1, 10, 19, 0.8)), 
-                    url("https://images.contentstack.io/v3/assets/blt731eb9a2ad37914/blt8094892591636c0d/6196ecf73449331139f4007d/LoL_Social_Share.jpg");
-        background-size: cover;
+        background: rgba(1, 10, 19, 0.7);
     }
+
     h1, h2, h3 {
-        color: #f0e6d2 !important;
-        text-shadow: 2px 2px #0a323c;
-        font-family: 'Beaufort for LoL', serif;
-    }
-    .stButton>button {
-        background-color: #1e2328;
-        color: #cdbe91;
-        border: 2px solid #785a28;
-        border-radius: 0px;
-        transition: 0.3s;
-        width: 100%;
-    }
-    .stButton>button:hover {
-        background-color: #32281e;
-        border-color: #c89b3c;
-        color: #f0e6d2;
-    }
-    .stTextInput>div>div>input {
-        background-color: #1e2328;
-        color: #f0e6d2;
-        border: 1px solid #785a28;
-    }
-    .stTabs [data-baseweb="tab"] {
-        color: #a09b8c;
-    }
-    .stTabs [aria-selected="true"] {
+        font-family: 'Cinzel', serif;
         color: #c8aa6e !important;
-        border-bottom-color: #c8aa6e !important;
+        text-align: center;
+        text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
+    }
+
+    /* Kotak Input & Area Teks */
+    .stTextInput>div>div>input, .stTextArea>div>div>textarea {
+        background-color: rgba(30, 35, 40, 0.9) !important;
+        color: #f0e6d2 !important;
+        border: 2px solid #785a28 !important;
+        border-radius: 5px;
+    }
+
+    /* Dekorasi Tombol Run */
+    .stButton>button {
+        background: linear-gradient(to bottom, #1e2328, #111);
+        color: #c8aa6e;
+        border: 2px solid #c8aa6e;
+        font-weight: bold;
+        width: 100%;
+        letter-spacing: 2px;
+    }
+    
+    .stButton>button:hover {
+        border-color: #f0e6d2;
+        color: #f0e6d2;
+        box-shadow: 0px 0px 15px rgba(200, 170, 110, 0.5);
+    }
+
+    /* Container Hasil */
+    .result-box {
+        background-color: rgba(10, 50, 60, 0.6);
+        border: 1px solid #0ac8b9;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
     }
     </style>
     """, unsafe_allow_html=True)
 
 # --- LOGIKA CORE ---
-class LOLChampionCryptography:
+class LOLCryptography:
     def __init__(self):
         self.table_t1 = {
             'A': ('TB', 1575), 'B': ('RC', 2400), 'C': ('NM', 225),  'D': ('NM', 2400),
@@ -79,95 +113,82 @@ class LOLChampionCryptography:
     def to_6bit_bin(self, n):
         weights = [32, 16, 8, 4, 2, 1]
         res = ""
-        temp = n
         for w in weights:
-            if temp >= w:
+            if n >= w:
                 res += "1"
-                temp -= w
+                n -= w
             else:
                 res += "0"
         return res
 
     def from_6bit_bin(self, b):
         weights = [32, 16, 8, 4, 2, 1]
-        total = 0
-        for i in range(len(b)):
-            if b[i] == '1':
-                total += weights[i]
-        return total
+        return sum(weights[i] for i, bit in enumerate(b) if bit == '1')
 
-crypto = LOLChampionCryptography()
+crypto = LOLCryptography()
 
-# --- TAMPILAN HEADER ---
-st.image("https://upload.wikimedia.org/wikipedia/commons/d/d8/League_of_Legends_2019_vector.svg", width=300)
-st.title("🛡️ Hextech Cryptography")
-st.write("Sembunyikan pesanmu di balik kode rahasia para Champion League of Legends.")
+# --- HEADER WEB ---
+st.markdown("<h1 style='font-size: 50px;'>LEAGUE OF LEGENDS</h1>", unsafe_allow_html=True)
+st.image("https://upload.wikimedia.org/wikipedia/commons/d/d8/League_of_Legends_2019_vector.svg", width=400)
+st.markdown("### 🛡️ Hextech Cryptography Terminal")
+st.write("<center>Gunakan kekuatan Champion untuk menyembunyikan pesan rahasiamu.</center>", unsafe_allow_html=True)
 
-# --- TAMPILAN TAB ---
-tab1, tab2 = st.tabs(["🔒 Encode Message", "🔓 Decode Cipher"])
+# --- TAMPILAN Champion Showcase ---
+st.markdown("---")
+cols = st.columns(4)
+champs = [
+    "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vi_0.jpg",
+    "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Caitlyn_0.jpg",
+    "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_0.jpg",
+    "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg"
+]
+for i, col in enumerate(cols):
+    col.image(champs[i], use_column_width=True)
+
+# --- TAB ENKRIPSI & DESKRIPSI ---
+tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
 
 with tab1:
-    st.markdown("### Enkripsi Karakter ke 12-Bit")
-    input_text = st.text_input("Plaintext:", placeholder="CONTOH: AKU KAYA").upper()
+    st.markdown("### 📝 Masukkan Pesan")
+    plaintext = st.text_input("Plaintext:", placeholder="CONTOH: NIO ARDI")
     
-    if input_text:
-        final_bins = []
-        st.info("🔄 Proses Konversi Hextech...")
-        
-        cols = st.columns(len(input_text) if len(input_text) > 0 else 1)
-        for i, char in enumerate(input_text):
+    if plaintext:
+        res_bins = []
+        for char in plaintext.upper():
             if char == " ":
-                final_bins.append(crypto.SPACE_BINARY)
-                st.write("🌌 Spasi terdeteksi")
+                res_bins.append(crypto.SPACE_BINARY)
             elif char in crypto.table_t1:
                 c_code, be = crypto.table_t1[char]
-                h1 = crypto.t2_h1[c_code]
-                h2 = crypto.get_h2(be)
-                bin_h1 = crypto.to_6bit_bin(ord(h1)-64)
-                bin_h2 = crypto.to_6bit_bin(ord(h2)-64)
-                combined = bin_h1 + bin_h2
-                final_bins.append(combined)
-                st.markdown(f"**{char}** : `{combined}`")
+                h1, h2 = crypto.t2_h1[c_code], crypto.get_h2(be)
+                bin_combined = crypto.to_6bit_bin(ord(h1)-64) + crypto.to_6bit_bin(ord(h2)-64)
+                res_bins.append(bin_combined)
         
-        hasil = " ".join(final_bins)
-        st.subheader("Biner Ciphertext:")
-        st.code(hasil, language="text")
+        st.markdown("<div class='result-box'>", unsafe_allow_html=True)
+        st.success("Biner Ciphertext:")
+        st.code(" ".join(res_bins))
+        st.markdown("</div>", unsafe_allow_html=True)
 
 with tab2:
-    st.markdown("### Deskripsi 12-Bit ke Karakter")
-    input_bin = st.text_area("Ciphertext (Biner):", placeholder="000011010010...")
+    st.markdown("### 🗝️ Masukkan Kode Biner")
+    ciphertext = st.text_area("Biner (12-bit per blok):")
     
-    if st.button("RUN DECODER"):
-        if input_bin:
-            bins = input_bin.split()
-            decoded_text = []
-            
+    if st.button("MULAI DEKRIPSI"):
+        if ciphertext:
+            bins = ciphertext.split()
+            decoded = ""
             for b in bins:
                 if b == crypto.SPACE_BINARY:
-                    decoded_text.append(" ")
-                    continue
-                
-                if len(b) == 12:
-                    val_h1 = crypto.from_6bit_bin(b[:6])
-                    val_h2 = crypto.from_6bit_bin(b[6:])
-                    h1_t = chr(val_h1 + 64)
-                    h2_t = chr(val_h2 + 64)
-                    
-                    found = "?"
+                    decoded += " "
+                elif len(b) == 12:
+                    h1_t = chr(crypto.from_6bit_bin(b[:6]) + 64)
+                    h2_t = chr(crypto.from_6bit_bin(b[6:]) + 64)
                     for char, (c_code, be) in crypto.table_t1.items():
                         if crypto.t2_h1[c_code] == h1_t and crypto.get_h2(be) == h2_t:
-                            found = char
+                            decoded += char
                             break
-                    decoded_text.append(found)
-                else:
-                    decoded_text.append("?")
-            
-            st.success("Pesan Terjemahan:")
-            st.header("".join(decoded_chars if 'decoded_chars' in locals() else decoded_text))
-        else:
-            st.error("Masukkan kode biner Hextech!")
+            st.markdown("<div class='result-box'>", unsafe_allow_html=True)
+            st.info("Pesan Terjemahan:")
+            st.header(decoded)
+            st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("---")
-st.caption("© 2026 LOL Champion Cryptography Project | Created by Sabranio Widiyanto")
-
-
+st.markdown("<br><br><center>© 2026 LOL Champion Cryptography Project | Created by Sabranio Widiyanto</center>", unsafe_allow_html=True)
