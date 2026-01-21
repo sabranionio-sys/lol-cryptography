@@ -4,7 +4,7 @@ import base64
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
-    page_title="Hextech Cryptography - League of Legends",
+    page_title="Hextech Cryptography",
     page_icon="⚔️",
     layout="wide"
 )
@@ -198,4 +198,5 @@ with tab2:
             st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<br><br><center>© 2026 LOL Champion Cryptography Project | Created by Sabranio Widiyanto</center>", unsafe_allow_html=True)
+
 
