@@ -118,10 +118,10 @@ st.markdown("---")
 ch_cols = st.columns(4)
 # Daftar link video YouTube Champion
 champs_videos = [
-    "https://youtu.be/fX08jvwW-AY?si=KrzXVxTOepmyrewO", # Video yang kamu berikan
-    "https://www.youtube.com/watch?v=vzHrjOMfHPY",     # Contoh video lainnya (Jinx)
-    "https://www.youtube.com/watch?v=0h59fTf08S8",     # Contoh video lainnya (Ekko)
-    "https://www.youtube.com/watch?v=TAsX2hGatX0"      # Contoh video lainnya (Caitlyn)
+    "https://youtu.be/fX08jvwW-AY?si=KrzXVxTOepmyrewO", 
+    "https://youtu.be/ePVscH1Yi3s?si=X8Cn3dOX6QAkxZI9",     
+    "https://youtu.be/S3F9CpeiSNE?si=aIMhnfwMPMAMKXN9",     
+    "https://youtu.be/bDMqoIq1kjo?si=mlrav1q4YMSggHcb"      
 ]
 
 for i, col in enumerate(ch_cols):
@@ -171,6 +171,7 @@ with tab2:
             st.info("Pesan Terjemahan:")
             st.header(decoded)
             st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
