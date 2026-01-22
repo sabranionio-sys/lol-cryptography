@@ -116,14 +116,18 @@ st.markdown("<p class='header-text'>Gunakan kekuatan Champion untuk menyembunyik
 # Showcase Champions
 st.markdown("---")
 ch_cols = st.columns(4)
-champs = [
-    "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vi_0.jpg",
-    "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Caitlyn_0.jpg",
-    "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_0.jpg",
-    "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg"
+# Daftar link video YouTube Champion
+champs_videos = [
+    "https://youtu.be/fX08jvwW-AY?si=KrzXVxTOepmyrewO", # Video yang kamu berikan
+    "https://www.youtube.com/watch?v=vzHrjOMfHPY",     # Contoh video lainnya (Jinx)
+    "https://www.youtube.com/watch?v=0h59fTf08S8",     # Contoh video lainnya (Ekko)
+    "https://www.youtube.com/watch?v=TAsX2hGatX0"      # Contoh video lainnya (Caitlyn)
 ]
+
 for i, col in enumerate(ch_cols):
-    col.image(champs[i], use_column_width=True)
+    with col:
+        # Menggunakan st.video untuk menampilkan pemutar YouTube
+        st.video(champs_videos[i])
 
 # Bagian Utama: Tab Enkripsi & Deskripsi
 tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
@@ -167,6 +171,7 @@ with tab2:
             st.info("Pesan Terjemahan:")
             st.header(decoded)
             st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
