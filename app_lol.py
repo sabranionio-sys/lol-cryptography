@@ -117,7 +117,7 @@ st.markdown("<p class='header-text'>Gunakan kekuatan Champion untuk menyembunyik
 st.markdown("---")
 ch_cols = st.columns(4)
 champs = [
-    "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vi_0.jpg",
+    "https://youtu.be/fX08jvwW-AY?si=EKwd3NV5Bpe248gB",
     "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Caitlyn_0.jpg",
     "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_0.jpg",
     "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg"
@@ -167,6 +167,7 @@ with tab2:
             st.info("Pesan Terjemahan:")
             st.header(decoded)
             st.markdown("</div>", unsafe_allow_html=True)
+
 
 
 
