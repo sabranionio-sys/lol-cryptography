@@ -21,7 +21,6 @@ def get_base64_of_bin_file(bin_file):
 def set_page_background(bin_file):
     bin_str = get_base64_of_bin_file(bin_file)
     if bin_str:
-        # CSS untuk mengatur gambar latar belakang agar full screen dan tetap (fixed)
         page_bg_img = '''
         <style>
         .stApp {
@@ -30,26 +29,21 @@ def set_page_background(bin_file):
             background-position: center;
             background-attachment: fixed;
         }
-        
-        /* Overlay transparan agar teks tetap kontras dan mudah dibaca */
         .stApp::before {
             content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%%;
-            height: 100%%;
-            background-color: rgba(1, 10, 19, 0.6); /* Gelapkan background 60%% */
+            top: 0; left: 0; width: 100%%; height: 100%%;
+            background-color: rgba(1, 10, 19, 0.6);
             z-index: -1;
         }
         </style>
         ''' % bin_str
         st.markdown(page_bg_img, unsafe_allow_html=True)
 
-# Pastikan file gambar Yasuo yang kamu unggah bernama 'bg.jpg' di repository GitHub
+# Pastikan file gambar background tersedia
 set_page_background('bg.png')
 
-# --- CSS DEKORASI ELEMEN ---
+# --- CSS DEKORASI & LINGKARAN FOTO ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
@@ -67,7 +61,6 @@ st.markdown("""
         text-shadow: 1px 1px 5px rgba(0,0,0,1);
     }
 
-    /* Gaya Kotak Hasil agar terlihat seperti UI Hextech */
     .result-box {
         background-color: rgba(10, 50, 60, 0.8);
         border: 2px solid #c8aa6e;
@@ -75,10 +68,36 @@ st.markdown("""
         border-radius: 10px;
         box-shadow: 0px 0px 15px rgba(200, 170, 110, 0.3);
     }
+
+    /* Gaya Foto Lingkaran Sempurna */
+    .circle-img {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #c8aa6e;
+        box-shadow: 0px 0px 20px rgba(200, 170, 110, 0.5);
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Gaya Tombol Custom */
+    .stButton>button {
+        background: linear-gradient(to bottom, #1e2328, #111);
+        color: #c8aa6e;
+        border: 1px solid #c8aa6e;
+        width: 100%;
+        font-weight: bold;
+    }
+    .stButton>button:hover {
+        background: #c8aa6e;
+        color: #1e2328;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-# --- KODE LOGIKA & HEADER (SAMA SEPERTI SEBELUMNYA) ---
+# --- LOGIKA KRIPTOGRAFI ---
 class LOLCryptography:
     def __init__(self):
         self.table_t1 = {
@@ -105,7 +124,7 @@ class LOLCryptography:
 
 crypto = LOLCryptography()
 
-# Layout Header Simetris
+# --- HEADER & SHOWCASE (BAGIAN ATAS) ---
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image("https://upload.wikimedia.org/wikipedia/commons/d/d8/League_of_Legends_2019_vector.svg", use_column_width=True)
@@ -113,10 +132,8 @@ with col2:
 st.markdown("### 🛡️ Hextech Cryptography Terminal")
 st.markdown("<p class='header-text'>Gunakan kekuatan Champion untuk menyembunyikan pesan rahasiamu.</p>", unsafe_allow_html=True)
 
-# Showcase Champions
 st.markdown("---")
 ch_cols = st.columns(4)
-# Daftar link video YouTube Champion
 champs_videos = [
     "https://youtu.be/fX08jvwW-AY?si=KrzXVxTOepmyrewO", 
     "https://youtu.be/ePVscH1Yi3s?si=X8Cn3dOX6QAkxZI9",     
@@ -126,25 +143,21 @@ champs_videos = [
 
 for i, col in enumerate(ch_cols):
     with col:
-        # Menggunakan st.video untuk menampilkan pemutar YouTube
         st.video(champs_videos[i])
 
-# Bagian Utama: Tab Enkripsi & Deskripsi
+# --- TAB ENKRIPSI ASLI ---
 tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
-
 with tab1:
     plaintext = st.text_input("Plaintext:", placeholder="Masukkan pesan...")
     if plaintext:
         res_bins = []
         for char in plaintext.upper():
-            if char == " ":
-                res_bins.append(crypto.SPACE_BINARY)
+            if char == " ": res_bins.append(crypto.SPACE_BINARY)
             elif char in crypto.table_t1:
                 c_code, be = crypto.table_t1[char]
                 h1, h2 = crypto.t2_h1[c_code], crypto.get_h2(be)
                 bin_combined = crypto.to_6bit_bin(ord(h1)-64) + crypto.to_6bit_bin(ord(h2)-64)
                 res_bins.append(bin_combined)
-        
         st.markdown("<div class='result-box'>", unsafe_allow_html=True)
         st.success("Biner Ciphertext:")
         st.code(" ".join(res_bins))
@@ -157,11 +170,9 @@ with tab2:
             bins = ciphertext.split()
             decoded = ""
             for b in bins:
-                if b == crypto.SPACE_BINARY:
-                    decoded += " "
+                if b == crypto.SPACE_BINARY: decoded += " "
                 elif len(b) == 12:
-                    h1_val = crypto.from_6bit_bin(b[:6])
-                    h2_val = crypto.from_6bit_bin(b[6:])
+                    h1_val, h2_val = crypto.from_6bit_bin(b[:6]), crypto.from_6bit_bin(b[6:])
                     h1_t, h2_t = chr(h1_val + 64), chr(h2_val + 64)
                     for char, (c_code, be) in crypto.table_t1.items():
                         if crypto.t2_h1[c_code] == h1_t and crypto.get_h2(be) == h2_t:
@@ -172,11 +183,25 @@ with tab2:
             st.header(decoded)
             st.markdown("</div>", unsafe_allow_html=True)
 
+# --- TAMBAHAN BAGIAN PALING BAWAH (TERMINAL KUSTOM) ---
+st.markdown("<br><br><hr>", unsafe_allow_html=True)
+bot_col_left, bot_col_right = st.columns([1.2, 1])
 
+with bot_col_left:
+    st.markdown("<h2 style='color: #c8aa6e; font-family: Cinzel;'>HEXTECH CRYPTOGRAPHY</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #f0e6d2;'>Sembunyikan pesan rahasiamu di balik kekuatan Hextech.</p>", unsafe_allow_html=True)
+    
+    # Tombol Berdampingan
+    btn_l, btn_r = st.columns(2)
+    with btn_l:
+        st.button("🔒 ENCODE MESSAGE", key="bot_encode")
+    with btn_r:
+        st.button("🔓 DECODE CIPHER", key="bot_decode")
 
-
-
-
-
-
-
+with bot_col_right:
+    # Menampilkan Foto Lingkaran Sempurna (Ganti URL dengan foto yang kamu mau)
+    st.markdown(f"""
+        <div style="text-align: center;">
+            <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg" class="circle-img">
+        </div>
+    """, unsafe_allow_html=True)
