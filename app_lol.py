@@ -11,6 +11,7 @@ st.set_page_config(
 )
 
 # --- FUNGSI ASSET ---
+@st.cache_data # Cache agar file hanya dibaca sekali untuk mencegah delay
 def get_base64(bin_file):
     try:
         if os.path.exists(bin_file):
@@ -21,29 +22,34 @@ def get_base64(bin_file):
         return ""
     return ""
 
-def set_page_background(bin_file):
-    bin_str = get_base64(bin_file)
-    if bin_str:
-        page_bg_img = '''
+# PRE-LOAD ASSETS (Memuat semua file ke memori di awal)
+VIDEO_DEFAULT = get_base64('my_video.mp4')
+VIDEO_FAKER = get_base64('faker_video.mp4')
+AUDIO_FAKER = get_base64('faker_voice.mp3')
+BG_IMG = get_base64('bg.png')
+
+def set_page_background():
+    if BG_IMG:
+        page_bg_img = f'''
         <style>
-        .stApp {
-            background-image: url("data:image/png;base64,%s");
+        .stApp {{
+            background-image: url("data:image/png;base64,{BG_IMG}");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-        }
-        .stApp::before {
+        }}
+        .stApp::before {{
             content: "";
             position: absolute;
-            top: 0; left: 0; width: 100%%; height: 100%%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(1, 10, 19, 0.7);
             z-index: -1;
-        }
+        }}
         </style>
-        ''' % bin_str
+        '''
         st.markdown(page_bg_img, unsafe_allow_html=True)
 
-set_page_background('bg.png')
+set_page_background()
 
 # --- CSS KHUSUS TAMPILAN ---
 st.markdown("""
@@ -100,7 +106,7 @@ class LOLCryptography:
 
 crypto = LOLCryptography()
 
-# --- HEADER ---
+# --- HEADER & VIDEO ATAS ---
 col_logo_1, col_logo_2, col_logo_3 = st.columns([1, 2, 1])
 with col_logo_2:
     st.image("https://upload.wikimedia.org/wikipedia/commons/d/d8/League_of_Legends_2019_vector.svg", use_column_width=True)
@@ -117,29 +123,28 @@ for i, col in enumerate(vid_cols):
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- FUNGSI RENDER VIDEO LINGKARAN (MUTED AGAR AUTOPLAY) ---
-def render_circle_video_muted(file_path):
-    video_b64 = get_base64(file_path)
-    if video_b64:
-        st.markdown(f"""
-            <div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
-                <video key="{file_path}" width="380" height="380" autoplay loop muted playsinline class="circle-video">
-                    <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
-                </video>
-            </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.error(f"⚠️ Video '{file_path}' tidak ditemukan!")
-
-# --- FUNGSI PEMUTAR AUDIO OTOMATIS ---
-def play_audio(file_path):
-    audio_b64 = get_base64(file_path)
-    if audio_b64:
-        st.markdown(f"""
+# --- FUNGSI RENDER KOMBINASI VIDEO & AUDIO ---
+def render_faker_special():
+    # Merender Video dan Audio secara bersamaan dalam satu blok HTML
+    st.markdown(f"""
+        <div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
+            <video key="faker_vid" width="380" height="380" autoplay loop muted playsinline class="circle-video">
+                <source src="data:video/mp4;base64,{VIDEO_FAKER}" type="video/mp4">
+            </video>
             <audio autoplay>
-                <source src="data:audio/mp3;base64,{audio_b64}" type="audio/mp3">
+                <source src="data:audio/mp3;base64,{AUDIO_FAKER}" type="audio/mp3">
             </audio>
-        """, unsafe_allow_html=True)
+        </div>
+    """, unsafe_allow_html=True)
+
+def render_default_video():
+    st.markdown(f"""
+        <div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
+            <video key="default_vid" width="380" height="380" autoplay loop muted playsinline class="circle-video">
+                <source src="data:video/mp4;base64,{VIDEO_DEFAULT}" type="video/mp4">
+            </video>
+        </div>
+    """, unsafe_allow_html=True)
 
 # --- TAB UTAMA ---
 tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
@@ -149,11 +154,9 @@ with tab1:
     with col_input:
         plaintext = st.text_input("Plaintext:", placeholder="Masukkan pesan...")
         
-        video_target = 'my_video.mp4'
-        if plaintext.lower() == "faker":
-            video_target = 'faker_video.mp4'
+        is_faker = plaintext.lower() == "faker"
+        if is_faker:
             st.warning("👑 UNKILLABLE DEMON KING DETECTED")
-            play_audio('faker_voice.mp3') # Memutar suara saat mengetik faker
 
         if plaintext:
             res_bins = []
@@ -170,7 +173,10 @@ with tab1:
             st.markdown("</div>", unsafe_allow_html=True)
             
     with col_vid:
-        render_circle_video_muted(video_target)
+        if is_faker:
+            render_faker_special() # Muncul bersamaan karena data sudah di memori
+        else:
+            render_default_video()
 
 with tab2:
     col_input_2, col_vid_2 = st.columns([1.5, 1])
@@ -194,4 +200,4 @@ with tab2:
                 st.header(decoded)
                 st.markdown("</div>", unsafe_allow_html=True)
     with col_vid_2:
-        render_circle_video_muted('my_video.mp4')
+        render_default_video()
