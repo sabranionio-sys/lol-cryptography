@@ -190,27 +190,84 @@ st.markdown("<br><br><hr>", unsafe_allow_html=True)
 _, bot_mid_col, _ = st.columns([1, 2, 1])
 
 with bot_mid_col:
-    # CSS Kustom untuk memperbesar lingkaran foto
-    st.markdown(f"""
-        <style>
-        .circle-img-large {{
-            width: 450px; /* Ukuran diperbesar dari sebelumnya */
-            height: 450px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid #c8aa6e;
-            box-shadow: 0px 0px 30px rgba(200, 170, 110, 0.6);
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            transition: transform 0.3s;
-        }}
-        .circle-img-large:hover {{
-            transform: scale(1.05); /* Efek sedikit membesar saat kursor di atasnya */
-        }}
-        </style>
-        <div style="text-align: center; margin-top: 20px;">
-            <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg" class="circle-img-large">
-        </div>
+   # --- CSS TAMBAHAN UNTUK LINGKARAN SEJAJAR ---
+st.markdown("""
+    <style>
+    .circle-img-side {
+        width: 350px; /* Ukuran disesuaikan agar pas di samping input */
+        height: 350px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #c8aa6e;
+        box-shadow: 0px 0px 20px rgba(200, 170, 110, 0.5);
+        display: block;
+        margin: auto;
+    }
+    </style>
     """, unsafe_allow_html=True)
 
+# --- BAGIAN UTAMA: TAB DENGAN FOTO DI SAMPING ---
+tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
+
+with tab1:
+    # Membagi baris menjadi dua kolom agar sejajar
+    col_text, col_photo = st.columns([1.5, 1])
+    
+    with col_text:
+        plaintext = st.text_input("Plaintext:", placeholder="Masukkan pesan...")
+        if plaintext:
+            res_bins = []
+            for char in plaintext.upper():
+                if char == " ":
+                    res_bins.append(crypto.SPACE_BINARY)
+                elif char in crypto.table_t1:
+                    c_code, be = crypto.table_t1[char]
+                    h1, h2 = crypto.t2_h1[c_code], crypto.get_h2(be)
+                    bin_combined = crypto.to_6bit_bin(ord(h1)-64) + crypto.to_6bit_bin(ord(h2)-64)
+                    res_bins.append(bin_combined)
+            
+            st.markdown("<div class='result-box'>", unsafe_allow_html=True)
+            st.success("Biner Ciphertext:")
+            st.code(" ".join(res_bins))
+            st.markdown("</div>", unsafe_allow_html=True)
+            
+    with col_photo:
+        # Foto muncul di sebelah kanan input plaintext
+        st.markdown(f"""
+            <div style="padding-top: 20px;">
+                <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg" class="circle-img-side">
+            </div>
+        """, unsafe_allow_html=True)
+
+with tab2:
+    col_text_dec, col_photo_dec = st.columns([1.5, 1])
+    
+    with col_text_dec:
+        ciphertext = st.text_area("Biner (12-bit per blok):")
+        if st.button("MULAI DEKRIPSI"):
+            # ... (Logika dekripsi tetap sama) ...
+            if ciphertext:
+                bins = ciphertext.split()
+                decoded = ""
+                for b in bins:
+                    if b == crypto.SPACE_BINARY: decoded += " "
+                    elif len(b) == 12:
+                        h1_val = crypto.from_6bit_bin(b[:6])
+                        h2_val = crypto.from_6bit_bin(b[6:])
+                        h1_t, h2_t = chr(h1_val + 64), chr(h2_val + 64)
+                        for char, (c_code, be) in crypto.table_t1.items():
+                            if crypto.t2_h1[c_code] == h1_t and crypto.get_h2(be) == h2_t:
+                                decoded += char
+                                break
+                st.markdown("<div class='result-box'>", unsafe_allow_html=True)
+                st.info("Pesan Terjemahan:")
+                st.header(decoded)
+                st.markdown("</div>", unsafe_allow_html=True)
+
+    with col_photo_dec:
+        # Foto juga muncul sejajar di tab dekripsi
+        st.markdown(f"""
+            <div style="padding-top: 20px;">
+                <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg" class="circle-img-side">
+            </div>
+        """, unsafe_allow_html=True)
