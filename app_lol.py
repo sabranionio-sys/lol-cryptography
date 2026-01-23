@@ -183,25 +183,34 @@ with tab2:
             st.header(decoded)
             st.markdown("</div>", unsafe_allow_html=True)
 
-# --- TAMBAHAN BAGIAN PALING BAWAH (TERMINAL KUSTOM) ---
+# --- TAMBAHAN BAGIAN PALING BAWAH (HANYA FOTO LINGKARAN BESAR) ---
 st.markdown("<br><br><hr>", unsafe_allow_html=True)
-bot_col_left, bot_col_right = st.columns([1.2, 1])
 
-with bot_col_left:
-    st.markdown("<h2 style='color: #c8aa6e; font-family: Cinzel;'>HEXTECH CRYPTOGRAPHY</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #f0e6d2;'>Sembunyikan pesan rahasiamu di balik kekuatan Hextech.</p>", unsafe_allow_html=True)
-    
-    # Tombol Berdampingan
-    btn_l, btn_r = st.columns(2)
-    with btn_l:
-        st.button("🔒 ENCODE MESSAGE", key="bot_encode")
-    with btn_r:
-        st.button("🔓 DECODE CIPHER", key="bot_decode")
+# Membuat satu kolom penuh untuk menaruh foto di tengah (atau gunakan st.columns jika ingin posisi spesifik)
+_, bot_mid_col, _ = st.columns([1, 2, 1])
 
-with bot_col_right:
-    # Menampilkan Foto Lingkaran Sempurna (Ganti URL dengan foto yang kamu mau)
+with bot_mid_col:
+    # CSS Kustom untuk memperbesar lingkaran foto
     st.markdown(f"""
-        <div style="text-align: center;">
-            <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg" class="circle-img">
+        <style>
+        .circle-img-large {{
+            width: 450px; /* Ukuran diperbesar dari sebelumnya */
+            height: 450px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #c8aa6e;
+            box-shadow: 0px 0px 30px rgba(200, 170, 110, 0.6);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            transition: transform 0.3s;
+        }}
+        .circle-img-large:hover {{
+            transform: scale(1.05); /* Efek sedikit membesar saat kursor di atasnya */
+        }}
+        </style>
+        <div style="text-align: center; margin-top: 20px;">
+            <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg" class="circle-img-large">
         </div>
     """, unsafe_allow_html=True)
+
