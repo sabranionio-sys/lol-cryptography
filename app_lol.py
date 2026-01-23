@@ -43,7 +43,7 @@ def set_page_background(bin_file):
         ''' % bin_str
         st.markdown(page_bg_img, unsafe_allow_html=True)
 
-# Pastikan file background 'bg.png' ada di repository
+# Memanggil background
 set_page_background('bg.png')
 
 # --- CSS KHUSUS TAMPILAN ---
@@ -70,12 +70,13 @@ st.markdown("""
         box-shadow: 0px 0px 15px rgba(200, 170, 110, 0.3);
         margin-top: 15px;
     }
-    /* Style Video Lingkaran Samping */
+    /* Style Video Lingkaran agar tidak transparan saat loading */
     .circle-video {
         border-radius: 50%;
         object-fit: cover;
         border: 4px solid #c8aa6e;
         box-shadow: 0px 0px 25px rgba(200, 170, 110, 0.6);
+        background-color: #010a13; 
     }
     </style>
     """, unsafe_allow_html=True)
@@ -121,29 +122,31 @@ for i, col in enumerate(vid_cols):
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- FUNGSI RENDER VIDEO LINGKARAN DINAMIS ---
+# --- FUNGSI RENDER VIDEO LINGKARAN (DENGAN PERBAIKAN RE-RENDER) ---
 def render_circle_video(file_path):
     video_b64 = get_base64(file_path)
     if video_b64:
+        # Menambahkan parameter acak/key pada tag video untuk memaksa browser memuat ulang
         st.markdown(f"""
             <div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
-                <video width="380" height="380" autoplay loop muted playsinline class="circle-video">
+                <video key="{file_path}" width="380" height="380" autoplay loop muted playsinline class="circle-video">
                     <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
                 </video>
             </div>
         """, unsafe_allow_html=True)
     else:
-        st.error(f"File {file_path} tidak ditemukan!")
+        # Tampilkan teks jika video tidak terbaca
+        st.error(f"⚠️ Video '{file_path}' tidak ditemukan!")
 
-# --- TAB UTAMA (EASTER EGG FAKER) ---
+# --- TAB UTAMA ---
 tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
 
 with tab1:
-    col_input, col_vid = st.columns([1.5, 1])
+    col_input, col_vid = st.columns([1.5, 1]) # Layout sejajar
     with col_input:
         plaintext = st.text_input("Plaintext:", placeholder="Masukkan pesan...")
         
-        # Logika Easter Egg Video
+        # Logika Perubahan Video
         video_target = 'my_video.mp4'
         if plaintext.lower() == "faker":
             video_target = 'faker_video.mp4'
@@ -165,7 +168,7 @@ with tab1:
             st.markdown("</div>", unsafe_allow_html=True)
             
     with col_vid:
-        render_circle_video(video_target)
+        render_circle_video(video_target) # Render video sesuai target
 
 with tab2:
     col_input_2, col_vid_2 = st.columns([1.5, 1])
