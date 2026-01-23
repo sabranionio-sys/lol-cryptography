@@ -33,14 +33,14 @@ def set_page_background(bin_file):
             content: "";
             position: absolute;
             top: 0; left: 0; width: 100%%; height: 100%%;
-            background-color: rgba(1, 10, 19, 0.6);
+            background-color: rgba(1, 10, 19, 0.7);
             z-index: -1;
         }
         </style>
         ''' % bin_str
         st.markdown(page_bg_img, unsafe_allow_html=True)
 
-# Pastikan file gambar background tersedia
+# Memanggil background (Pastikan file bg.png ada di GitHub kamu)
 set_page_background('bg.png')
 
 # --- CSS DEKORASI & LINGKARAN FOTO ---
@@ -69,35 +69,28 @@ st.markdown("""
         box-shadow: 0px 0px 15px rgba(200, 170, 110, 0.3);
     }
 
-    /* Gaya Foto Lingkaran Sempurna */
-    .circle-img {
-        width: 300px;
-        height: 300px;
+    /* Gaya Foto Lingkaran Samping */
+    .circle-img-side {
+        width: 380px;
+        height: 380px;
         border-radius: 50%;
         object-fit: cover;
         border: 4px solid #c8aa6e;
-        box-shadow: 0px 0px 20px rgba(200, 170, 110, 0.5);
+        box-shadow: 0px 0px 25px rgba(200, 170, 110, 0.6);
         display: block;
-        margin-left: auto;
-        margin-right: auto;
+        margin: auto;
     }
-
-    /* Gaya Tombol Custom */
-    .stButton>button {
-        background: linear-gradient(to bottom, #1e2328, #111);
-        color: #c8aa6e;
-        border: 1px solid #c8aa6e;
-        width: 100%;
+    
+    /* Mempercantik Tab */
+    .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
+        font-size: 18px;
         font-weight: bold;
-    }
-    .stButton>button:hover {
-        background: #c8aa6e;
-        color: #1e2328;
+        color: #c8aa6e;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- LOGIKA KRIPTOGRAFI ---
+# --- KODE LOGIKA KRIPTOGRAFI ---
 class LOLCryptography:
     def __init__(self):
         self.table_t1 = {
@@ -124,7 +117,7 @@ class LOLCryptography:
 
 crypto = LOLCryptography()
 
-# --- HEADER & SHOWCASE (BAGIAN ATAS) ---
+# --- HEADER (LOGO LEAGUE OF LEGENDS) ---
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image("https://upload.wikimedia.org/wikipedia/commons/d/d8/League_of_Legends_2019_vector.svg", use_column_width=True)
@@ -132,6 +125,7 @@ with col2:
 st.markdown("### 🛡️ Hextech Cryptography Terminal")
 st.markdown("<p class='header-text'>Gunakan kekuatan Champion untuk menyembunyikan pesan rahasiamu.</p>", unsafe_allow_html=True)
 
+# --- SHOWCASE 4 VIDEO (BAGIAN ATAS) ---
 st.markdown("---")
 ch_cols = st.columns(4)
 champs_videos = [
@@ -143,74 +137,15 @@ champs_videos = [
 
 for i, col in enumerate(ch_cols):
     with col:
-        st.video(champs_videos[i])
+        st.video(champs_videos[i]) # Menampilkan galeri video
 
-# --- TAB ENKRIPSI ASLI ---
-tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
-with tab1:
-    plaintext = st.text_input("Plaintext:", placeholder="Masukkan pesan...")
-    if plaintext:
-        res_bins = []
-        for char in plaintext.upper():
-            if char == " ": res_bins.append(crypto.SPACE_BINARY)
-            elif char in crypto.table_t1:
-                c_code, be = crypto.table_t1[char]
-                h1, h2 = crypto.t2_h1[c_code], crypto.get_h2(be)
-                bin_combined = crypto.to_6bit_bin(ord(h1)-64) + crypto.to_6bit_bin(ord(h2)-64)
-                res_bins.append(bin_combined)
-        st.markdown("<div class='result-box'>", unsafe_allow_html=True)
-        st.success("Biner Ciphertext:")
-        st.code(" ".join(res_bins))
-        st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
-with tab2:
-    ciphertext = st.text_area("Biner (12-bit per blok):")
-    if st.button("MULAI DEKRIPSI"):
-        if ciphertext:
-            bins = ciphertext.split()
-            decoded = ""
-            for b in bins:
-                if b == crypto.SPACE_BINARY: decoded += " "
-                elif len(b) == 12:
-                    h1_val, h2_val = crypto.from_6bit_bin(b[:6]), crypto.from_6bit_bin(b[6:])
-                    h1_t, h2_t = chr(h1_val + 64), chr(h2_val + 64)
-                    for char, (c_code, be) in crypto.table_t1.items():
-                        if crypto.t2_h1[c_code] == h1_t and crypto.get_h2(be) == h2_t:
-                            decoded += char
-                            break
-            st.markdown("<div class='result-box'>", unsafe_allow_html=True)
-            st.info("Pesan Terjemahan:")
-            st.header(decoded)
-            st.markdown("</div>", unsafe_allow_html=True)
-
-# --- TAMBAHAN BAGIAN PALING BAWAH (HANYA FOTO LINGKARAN BESAR) ---
-st.markdown("<br><br><hr>", unsafe_allow_html=True)
-
-# Membuat satu kolom penuh untuk menaruh foto di tengah (atau gunakan st.columns jika ingin posisi spesifik)
-_, bot_mid_col, _ = st.columns([1, 2, 1])
-
-with bot_mid_col:
-   # --- CSS TAMBAHAN UNTUK LINGKARAN SEJAJAR ---
-st.markdown("""
-    <style>
-    .circle-img-side {
-        width: 350px; /* Ukuran disesuaikan agar pas di samping input */
-        height: 350px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 4px solid #c8aa6e;
-        box-shadow: 0px 0px 20px rgba(200, 170, 110, 0.5);
-        display: block;
-        margin: auto;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-# --- BAGIAN UTAMA: TAB DENGAN FOTO DI SAMPING ---
+# --- BAGIAN UTAMA: TAB DENGAN FOTO SEJAJAR ---
 tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
 
 with tab1:
-    # Membagi baris menjadi dua kolom agar sejajar
+    # Mengatur dua kolom agar input teks sejajar dengan foto lingkaran
     col_text, col_photo = st.columns([1.5, 1])
     
     with col_text:
@@ -232,9 +167,9 @@ with tab1:
             st.markdown("</div>", unsafe_allow_html=True)
             
     with col_photo:
-        # Foto muncul di sebelah kanan input plaintext
+        # Menampilkan foto Yasuo lingkaran besar di sebelah kanan input
         st.markdown(f"""
-            <div style="padding-top: 20px;">
+            <div style="text-align: center;">
                 <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg" class="circle-img-side">
             </div>
         """, unsafe_allow_html=True)
@@ -245,12 +180,12 @@ with tab2:
     with col_text_dec:
         ciphertext = st.text_area("Biner (12-bit per blok):")
         if st.button("MULAI DEKRIPSI"):
-            # ... (Logika dekripsi tetap sama) ...
             if ciphertext:
                 bins = ciphertext.split()
                 decoded = ""
                 for b in bins:
-                    if b == crypto.SPACE_BINARY: decoded += " "
+                    if b == crypto.SPACE_BINARY:
+                        decoded += " "
                     elif len(b) == 12:
                         h1_val = crypto.from_6bit_bin(b[:6])
                         h2_val = crypto.from_6bit_bin(b[6:])
@@ -267,7 +202,7 @@ with tab2:
     with col_photo_dec:
         # Foto juga muncul sejajar di tab dekripsi
         st.markdown(f"""
-            <div style="padding-top: 20px;">
+            <div style="text-align: center;">
                 <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg" class="circle-img-side">
             </div>
         """, unsafe_allow_html=True)
