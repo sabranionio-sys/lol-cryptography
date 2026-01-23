@@ -1,6 +1,7 @@
 import streamlit as st
 import math
 import base64
+import os
 
 # --- KONFIGURASI HALAMAN ---
 st.set_page_config(
@@ -9,8 +10,8 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- FUNGSI UNTUK MERENDER BACKGROUND GAMBAR ---
-def get_base64_of_bin_file(bin_file):
+# --- FUNGSI ASSET (GAMBAR & VIDEO) ---
+def get_base64(bin_file):
     try:
         with open(bin_file, 'rb') as f:
             data = f.read()
@@ -19,7 +20,7 @@ def get_base64_of_bin_file(bin_file):
         return ""
 
 def set_page_background(bin_file):
-    bin_str = get_base64_of_bin_file(bin_file)
+    bin_str = get_base64(bin_file)
     if bin_str:
         page_bg_img = '''
         <style>
@@ -33,17 +34,17 @@ def set_page_background(bin_file):
             content: "";
             position: absolute;
             top: 0; left: 0; width: 100%%; height: 100%%;
-            background-color: rgba(1, 10, 19, 0.7);
+            background-color: rgba(1, 10, 19, 0.75);
             z-index: -1;
         }
         </style>
         ''' % bin_str
         st.markdown(page_bg_img, unsafe_allow_html=True)
 
-# Memanggil background (Pastikan file bg.png ada di GitHub kamu)
+# Panggil Background (Pastikan bg.png ada di folder yang sama)
 set_page_background('bg.png')
 
-# --- CSS DEKORASI & LINGKARAN FOTO ---
+# --- CSS KHUSUS TAMPILAN ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
@@ -54,43 +55,30 @@ st.markdown("""
         text-align: center;
         text-shadow: 2px 2px 8px rgba(0,0,0,1);
     }
-
     .header-text {
         text-align: center;
         color: #f0e6d2;
         text-shadow: 1px 1px 5px rgba(0,0,0,1);
     }
-
     .result-box {
         background-color: rgba(10, 50, 60, 0.8);
         border: 2px solid #c8aa6e;
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0px 0px 15px rgba(200, 170, 110, 0.3);
+        margin-top: 15px;
     }
-
-    /* Gaya Foto Lingkaran Samping */
-    .circle-img-side {
-        width: 380px;
-        height: 380px;
+    /* Style Video Lingkaran */
+    .circle-video {
         border-radius: 50%;
         object-fit: cover;
         border: 4px solid #c8aa6e;
         box-shadow: 0px 0px 25px rgba(200, 170, 110, 0.6);
-        display: block;
-        margin: auto;
-    }
-    
-    /* Mempercantik Tab */
-    .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-        font-size: 18px;
-        font-weight: bold;
-        color: #c8aa6e;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- KODE LOGIKA KRIPTOGRAFI ---
+# --- LOGIKA KRIPTOGRAFI ---
 class LOLCryptography:
     def __init__(self):
         self.table_t1 = {
@@ -109,86 +97,77 @@ class LOLCryptography:
         index = math.ceil(be / 200)
         return chr(ord('K') + index - 1)
 
-    def to_6bit_bin(self, n):
-        return format(n, '06b')
-
-    def from_6bit_bin(self, b):
-        return int(b, 2)
-
 crypto = LOLCryptography()
 
-# --- HEADER (LOGO LEAGUE OF LEGENDS) ---
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
+# --- HEADER & VIDEO ATAS ---
+col_logo_1, col_logo_2, col_logo_3 = st.columns([1, 2, 1])
+with col_logo_2:
     st.image("https://upload.wikimedia.org/wikipedia/commons/d/d8/League_of_Legends_2019_vector.svg", use_column_width=True)
 
 st.markdown("### 🛡️ Hextech Cryptography Terminal")
 st.markdown("<p class='header-text'>Gunakan kekuatan Champion untuk menyembunyikan pesan rahasiamu.</p>", unsafe_allow_html=True)
 
-# --- SHOWCASE 4 VIDEO (BAGIAN ATAS) ---
 st.markdown("---")
-ch_cols = st.columns(4)
-champs_videos = [
-    "https://youtu.be/fX08jvwW-AY?si=KrzXVxTOepmyrewO", 
-    "https://youtu.be/ePVscH1Yi3s?si=X8Cn3dOX6QAkxZI9",     
-    "https://youtu.be/S3F9CpeiSNE?si=aIMhnfwMPMAMKXN9",     
-    "https://youtu.be/bDMqoIq1kjo?si=mlrav1q4YMSggHcb"      
+vid_cols = st.columns(4)
+vids = [
+    "https://youtu.be/fX08jvwW-AY", "https://youtu.be/ePVscH1Yi3s", 
+    "https://youtu.be/S3F9CpeiSNE", "https://youtu.be/bDMqoIq1kjo"
 ]
-
-for i, col in enumerate(ch_cols):
+for i, col in enumerate(vid_cols):
     with col:
-        st.video(champs_videos[i]) # Menampilkan galeri video
+        st.video(vids[i]) # Galeri video atas
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- BAGIAN UTAMA: TAB DENGAN FOTO SEJAJAR ---
+# --- FUNGSI RENDER VIDEO LINGKARAN ---
+def render_circle_video(file_path):
+    video_b64 = get_base64(file_path)
+    if video_b64:
+        st.markdown(f"""
+            <div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
+                <video width="380" height="380" autoplay loop muted playsinline class="circle-video">
+                    <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
+                </video>
+            </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.warning("File video tidak ditemukan. Pastikan 'my_video.mp4' ada di GitHub.")
+
+# --- TAB UTAMA (INPUT SEJAJAR VIDEO LINGKARAN) ---
 tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
 
 with tab1:
-    # Mengatur dua kolom agar input teks sejajar dengan foto lingkaran
-    col_text, col_photo = st.columns([1.5, 1])
-    
-    with col_text:
+    col_input, col_vid = st.columns([1.5, 1]) # Layout sejajar
+    with col_input:
         plaintext = st.text_input("Plaintext:", placeholder="Masukkan pesan...")
         if plaintext:
             res_bins = []
             for char in plaintext.upper():
-                if char == " ":
-                    res_bins.append(crypto.SPACE_BINARY)
+                if char == " ": res_bins.append(crypto.SPACE_BINARY)
                 elif char in crypto.table_t1:
                     c_code, be = crypto.table_t1[char]
                     h1, h2 = crypto.t2_h1[c_code], crypto.get_h2(be)
-                    bin_combined = crypto.to_6bit_bin(ord(h1)-64) + crypto.to_6bit_bin(ord(h2)-64)
+                    bin_combined = format(ord(h1)-64, '06b') + format(ord(h2)-64, '06b')
                     res_bins.append(bin_combined)
-            
             st.markdown("<div class='result-box'>", unsafe_allow_html=True)
             st.success("Biner Ciphertext:")
             st.code(" ".join(res_bins))
             st.markdown("</div>", unsafe_allow_html=True)
-            
-    with col_photo:
-        # Menampilkan foto Yasuo lingkaran besar di sebelah kanan input
-        st.markdown(f"""
-            <div style="text-align: center;">
-                <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg" class="circle-img-side">
-            </div>
-        """, unsafe_allow_html=True)
+    with col_vid:
+        render_circle_video('my_video.mp4') # Video lingkaran di samping
 
 with tab2:
-    col_text_dec, col_photo_dec = st.columns([1.5, 1])
-    
-    with col_text_dec:
+    col_input_2, col_vid_2 = st.columns([1.5, 1])
+    with col_input_2:
         ciphertext = st.text_area("Biner (12-bit per blok):")
         if st.button("MULAI DEKRIPSI"):
             if ciphertext:
                 bins = ciphertext.split()
                 decoded = ""
                 for b in bins:
-                    if b == crypto.SPACE_BINARY:
-                        decoded += " "
+                    if b == crypto.SPACE_BINARY: decoded += " "
                     elif len(b) == 12:
-                        h1_val = crypto.from_6bit_bin(b[:6])
-                        h2_val = crypto.from_6bit_bin(b[6:])
+                        h1_val, h2_val = int(b[:6], 2), int(b[6:], 2)
                         h1_t, h2_t = chr(h1_val + 64), chr(h2_val + 64)
                         for char, (c_code, be) in crypto.table_t1.items():
                             if crypto.t2_h1[c_code] == h1_t and crypto.get_h2(be) == h2_t:
@@ -198,11 +177,5 @@ with tab2:
                 st.info("Pesan Terjemahan:")
                 st.header(decoded)
                 st.markdown("</div>", unsafe_allow_html=True)
-
-    with col_photo_dec:
-        # Foto juga muncul sejajar di tab dekripsi
-        st.markdown(f"""
-            <div style="text-align: center;">
-                <img src="https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg" class="circle-img-side">
-            </div>
-        """, unsafe_allow_html=True)
+    with col_vid_2:
+        render_circle_video('my_video.mp4')
