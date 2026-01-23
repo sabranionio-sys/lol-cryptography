@@ -10,14 +10,16 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- FUNGSI ASSET (GAMBAR & VIDEO) ---
+# --- FUNGSI ASSET ---
 def get_base64(bin_file):
     try:
-        with open(bin_file, 'rb') as f:
-            data = f.read()
-        return base64.b64encode(data).decode()
+        if os.path.exists(bin_file):
+            with open(bin_file, 'rb') as f:
+                data = f.read()
+            return base64.b64encode(data).decode()
     except Exception:
         return ""
+    return ""
 
 def set_page_background(bin_file):
     bin_str = get_base64(bin_file)
@@ -34,14 +36,14 @@ def set_page_background(bin_file):
             content: "";
             position: absolute;
             top: 0; left: 0; width: 100%%; height: 100%%;
-            background-color: rgba(1, 10, 19, 0.75);
+            background-color: rgba(1, 10, 19, 0.7);
             z-index: -1;
         }
         </style>
         ''' % bin_str
         st.markdown(page_bg_img, unsafe_allow_html=True)
 
-# Panggil Background (Pastikan bg.png ada di folder yang sama)
+# Pastikan file background 'bg.png' ada di repository
 set_page_background('bg.png')
 
 # --- CSS KHUSUS TAMPILAN ---
@@ -68,7 +70,7 @@ st.markdown("""
         box-shadow: 0px 0px 15px rgba(200, 170, 110, 0.3);
         margin-top: 15px;
     }
-    /* Style Video Lingkaran */
+    /* Style Video Lingkaran Samping */
     .circle-video {
         border-radius: 50%;
         object-fit: cover;
@@ -115,11 +117,11 @@ vids = [
 ]
 for i, col in enumerate(vid_cols):
     with col:
-        st.video(vids[i]) # Galeri video atas
+        st.video(vids[i])
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- FUNGSI RENDER VIDEO LINGKARAN ---
+# --- FUNGSI RENDER VIDEO LINGKARAN DINAMIS ---
 def render_circle_video(file_path):
     video_b64 = get_base64(file_path)
     if video_b64:
@@ -131,15 +133,22 @@ def render_circle_video(file_path):
             </div>
         """, unsafe_allow_html=True)
     else:
-        st.warning("File video tidak ditemukan. Pastikan 'my_video.mp4' ada di GitHub.")
+        st.error(f"File {file_path} tidak ditemukan!")
 
-# --- TAB UTAMA (INPUT SEJAJAR VIDEO LINGKARAN) ---
+# --- TAB UTAMA (EASTER EGG FAKER) ---
 tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
 
 with tab1:
-    col_input, col_vid = st.columns([1.5, 1]) # Layout sejajar
+    col_input, col_vid = st.columns([1.5, 1])
     with col_input:
         plaintext = st.text_input("Plaintext:", placeholder="Masukkan pesan...")
+        
+        # Logika Easter Egg Video
+        video_target = 'my_video.mp4'
+        if plaintext.lower() == "faker":
+            video_target = 'faker_video.mp4'
+            st.warning("👑 UNKILLABLE DEMON KING DETECTED")
+
         if plaintext:
             res_bins = []
             for char in plaintext.upper():
@@ -149,12 +158,14 @@ with tab1:
                     h1, h2 = crypto.t2_h1[c_code], crypto.get_h2(be)
                     bin_combined = format(ord(h1)-64, '06b') + format(ord(h2)-64, '06b')
                     res_bins.append(bin_combined)
+            
             st.markdown("<div class='result-box'>", unsafe_allow_html=True)
             st.success("Biner Ciphertext:")
             st.code(" ".join(res_bins))
             st.markdown("</div>", unsafe_allow_html=True)
+            
     with col_vid:
-        render_circle_video('my_video.mp4') # Video lingkaran di samping
+        render_circle_video(video_target)
 
 with tab2:
     col_input_2, col_vid_2 = st.columns([1.5, 1])
