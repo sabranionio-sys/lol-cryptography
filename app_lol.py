@@ -43,7 +43,6 @@ def set_page_background(bin_file):
         ''' % bin_str
         st.markdown(page_bg_img, unsafe_allow_html=True)
 
-# Memanggil background
 set_page_background('bg.png')
 
 # --- CSS KHUSUS TAMPILAN ---
@@ -70,7 +69,6 @@ st.markdown("""
         box-shadow: 0px 0px 15px rgba(200, 170, 110, 0.3);
         margin-top: 15px;
     }
-    /* Style Video Lingkaran agar tidak transparan saat loading */
     .circle-video {
         border-radius: 50%;
         object-fit: cover;
@@ -102,7 +100,7 @@ class LOLCryptography:
 
 crypto = LOLCryptography()
 
-# --- HEADER & VIDEO ATAS ---
+# --- HEADER ---
 col_logo_1, col_logo_2, col_logo_3 = st.columns([1, 2, 1])
 with col_logo_2:
     st.image("https://upload.wikimedia.org/wikipedia/commons/d/d8/League_of_Legends_2019_vector.svg", use_column_width=True)
@@ -112,21 +110,17 @@ st.markdown("<p class='header-text'>Gunakan kekuatan Champion untuk menyembunyik
 
 st.markdown("---")
 vid_cols = st.columns(4)
-vids = [
-    "https://youtu.be/fX08jvwW-AY", "https://youtu.be/ePVscH1Yi3s", 
-    "https://youtu.be/S3F9CpeiSNE", "https://youtu.be/bDMqoIq1kjo"
-]
+vids = ["https://youtu.be/fX08jvwW-AY", "https://youtu.be/ePVscH1Yi3s", "https://youtu.be/S3F9CpeiSNE", "https://youtu.be/bDMqoIq1kjo"]
 for i, col in enumerate(vid_cols):
     with col:
         st.video(vids[i])
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- FUNGSI RENDER VIDEO LINGKARAN (DENGAN PERBAIKAN RE-RENDER) ---
-def render_circle_video(file_path):
+# --- FUNGSI RENDER VIDEO LINGKARAN (MUTED AGAR AUTOPLAY) ---
+def render_circle_video_muted(file_path):
     video_b64 = get_base64(file_path)
     if video_b64:
-        # Menambahkan parameter acak/key pada tag video untuk memaksa browser memuat ulang
         st.markdown(f"""
             <div style="display: flex; justify-content: center; align-items: center; padding: 10px;">
                 <video key="{file_path}" width="380" height="380" autoplay loop muted playsinline class="circle-video">
@@ -135,22 +129,31 @@ def render_circle_video(file_path):
             </div>
         """, unsafe_allow_html=True)
     else:
-        # Tampilkan teks jika video tidak terbaca
         st.error(f"⚠️ Video '{file_path}' tidak ditemukan!")
+
+# --- FUNGSI PEMUTAR AUDIO OTOMATIS ---
+def play_audio(file_path):
+    audio_b64 = get_base64(file_path)
+    if audio_b64:
+        st.markdown(f"""
+            <audio autoplay>
+                <source src="data:audio/mp3;base64,{audio_b64}" type="audio/mp3">
+            </audio>
+        """, unsafe_allow_html=True)
 
 # --- TAB UTAMA ---
 tab1, tab2 = st.tabs(["🔒 ENCODE MESSAGE", "🔓 DECODE CIPHER"])
 
 with tab1:
-    col_input, col_vid = st.columns([1.5, 1]) # Layout sejajar
+    col_input, col_vid = st.columns([1.5, 1])
     with col_input:
         plaintext = st.text_input("Plaintext:", placeholder="Masukkan pesan...")
         
-        # Logika Perubahan Video
         video_target = 'my_video.mp4'
         if plaintext.lower() == "faker":
             video_target = 'faker_video.mp4'
             st.warning("👑 UNKILLABLE DEMON KING DETECTED")
+            play_audio('faker_voice.mp3') # Memutar suara saat mengetik faker
 
         if plaintext:
             res_bins = []
@@ -161,14 +164,13 @@ with tab1:
                     h1, h2 = crypto.t2_h1[c_code], crypto.get_h2(be)
                     bin_combined = format(ord(h1)-64, '06b') + format(ord(h2)-64, '06b')
                     res_bins.append(bin_combined)
-            
             st.markdown("<div class='result-box'>", unsafe_allow_html=True)
             st.success("Biner Ciphertext:")
             st.code(" ".join(res_bins))
             st.markdown("</div>", unsafe_allow_html=True)
             
     with col_vid:
-        render_circle_video(video_target) # Render video sesuai target
+        render_circle_video_muted(video_target)
 
 with tab2:
     col_input_2, col_vid_2 = st.columns([1.5, 1])
@@ -192,4 +194,4 @@ with tab2:
                 st.header(decoded)
                 st.markdown("</div>", unsafe_allow_html=True)
     with col_vid_2:
-        render_circle_video('my_video.mp4')
+        render_circle_video_muted('my_video.mp4')
